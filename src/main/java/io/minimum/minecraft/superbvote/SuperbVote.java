@@ -11,6 +11,7 @@ import io.minimum.minecraft.superbvote.storage.RecentVotesStorage;
 import io.minimum.minecraft.superbvote.storage.VoteStorage;
 import io.minimum.minecraft.superbvote.util.BrokenNag;
 import io.minimum.minecraft.superbvote.util.SpigotUpdater;
+import io.minimum.minecraft.superbvote.util.TaskQueueManager;
 import io.minimum.minecraft.superbvote.util.cooldowns.VoteServiceCooldown;
 import io.minimum.minecraft.superbvote.votes.SuperbVoteListener;
 import io.minimum.minecraft.superbvote.votes.VoteReminder;
@@ -38,6 +39,8 @@ public class SuperbVote extends JavaPlugin {
     private VoteServiceCooldown voteServiceCooldown;
     @Getter
     private TopPlayerSignStorage topPlayerSignStorage;
+    @Getter
+    private TaskQueueManager taskQueueManager;
     private BukkitTask voteReminderTask;
 
     @Override
@@ -100,6 +103,10 @@ public class SuperbVote extends JavaPlugin {
         SpigotUpdater updater = new SpigotUpdater();
         getServer().getScheduler().runTaskAsynchronously(this, updater);
         getServer().getPluginManager().registerEvents(updater, this);
+
+        taskQueueManager = new TaskQueueManager();
+        // Schedule to process tasks every 10 ticks (500 ms)
+        taskQueueManager.runTaskTimer(this, 0, 5);
     }
 
     @Override
